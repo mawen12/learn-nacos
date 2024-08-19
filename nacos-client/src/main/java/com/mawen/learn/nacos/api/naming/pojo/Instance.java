@@ -2,7 +2,6 @@ package com.mawen.learn.nacos.api.naming.pojo;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
