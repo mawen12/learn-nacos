@@ -1,6 +1,7 @@
 package com.mawen.learn.nacos.common.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.CharArrayWriter;
 import java.io.File;
@@ -146,5 +147,28 @@ public class IoUtils {
 		}
 
 		return null;
+	}
+
+	public static byte[] tryDecompress(byte[] raw) throws Exception {
+		if (!isGzipStream(raw)) {
+			return raw;
+		}
+
+		GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(raw));
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+		IoUtils.copy(gis, out);
+
+		return out.toByteArray();
+	}
+
+	public static boolean isGzipStream(byte[] bytes) {
+
+		int minByteArraySize = 2;
+		if (bytes == null || bytes.length < minByteArraySize) {
+			return false;
+		}
+
+		return GZIPInputStream.GZIP_MAGIC == ((bytes[1] << 8 | bytes[0]) & 0xFFFF);
 	}
 }
