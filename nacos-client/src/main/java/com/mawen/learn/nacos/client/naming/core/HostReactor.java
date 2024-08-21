@@ -248,7 +248,7 @@ public class HostReactor {
 		updateDom4AllIPNow(dom, clusters, env, -1L);
 	}
 
-	public void updateDom4AllNow(String dom, String clusters, String env, long timeout) {
+	public void updateDom4AllIPNow(String dom, String clusters, String env, long timeout) {
 		try {
 			Map<String, String> params = new HashMap<>(8);
 			params.put("dom", dom);
@@ -290,10 +290,71 @@ public class HostReactor {
 			params.put("clientIP", NetUtils.localIP());
 
 			StringBuilder sb = new StringBuilder();
-			Balancer
+			for (String string : Balancer.UNCONSISTENT_DOM_WITH_ADDRESS_SERVER) {
+				sb.append(string).append(",");
+			}
 
-			params.put("checksum", oldDom.getChecksum());
+			Balancer.UNCONSISTENT_DOM_WITH_ADDRESS_SERVER.clear();
+			params.put("unconsistentDom", sb.toString());
 
+			String envSpliter = ",";
+			if (!StringUtils.isEmpty(env) && !env.contains(envSpliter)) {
+				params.put("useEnvId", "true");
+			}
+
+			if (oldDom != null) {
+				params.put("checksum", oldDom.getChecksum());
+			}
+
+			String result = serverProxy.reqAPI(UtilAndComs.NACOS_URL_BASE + "/api/srvIPXT", params);
+			if (StringUtils.isNotEmpty(result)) {
+				processDomJSON(result);
+			}
+		}
+		catch (Exception e) {
+			log.error("NA failed to update dom: {}", dom, e);
+		}
+		finally {
+			if (oldDom != null) {
+				synchronized (oldDom) {
+					oldDom.notifyAll();
+				}
+			}
+		}
+	}
+
+	public void refreshOnly(String dom, String clusters, String env, boolean allIps) {
+		try {
+			Map<String, String> params = new HashMap<>(24);
+			params.put("dom", dom);
+			params.put("clusters", clusters);
+			params.put("udpPort", String.valueOf(pushRecver.getUDPPort()));
+			params.put("unit", env);
+			params.put("clientIP", NetUtils.localIP());
+
+			String domSpliter = ",";
+			StringBuilder sb = new StringBuilder();
+			for (String string : Balancer.UNCONSISTENT_DOM_WITH_ADDRESS_SERVER) {
+				sb.append(string).append(domSpliter);
+			}
+
+			Balancer.UNCONSISTENT_DOM_WITH_ADDRESS_SERVER.clear();
+			params.put("unconsistentDom", sb.toString());
+
+			String envSpliter = ",";
+			if (!env.contains(envSpliter)) {
+				params.put("useEnvId", "true");
+			}
+
+			if (allIps) {
+				serverProxy.reqAPI(UtilAndComs.NACOS_URL_BASE + "/api/srvAllIP", params);
+			}
+			else {
+				serverProxy.reqAPI(UtilAndComs.NACOS_URL_BASE + "/api/srvIPXT", params);
+			}
+		}
+		catch (Exception e) {
+			log.error("Na failed to update dom: {}", e);
 		}
 	}
 
@@ -341,7 +402,7 @@ public class HostReactor {
 				if (domObj.getLastRefTime() <= lastRefTime) {
 					if (allIPs) {
 						updateDom4AllIPNow(dom, clusters, env);
-						domobj = domMap.get(Domain.getKey(dom, clusters, env, true));
+						domObj = domMap.get(Domain.getKey(dom, clusters, env, true));
 					}
 					else {
 						updateDomNow(dom, clusters, env);

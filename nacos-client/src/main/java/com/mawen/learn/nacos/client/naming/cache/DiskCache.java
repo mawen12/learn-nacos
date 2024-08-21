@@ -14,6 +14,7 @@ import com.alibaba.fastjson.JSON;
 import com.mawen.learn.nacos.api.naming.pojo.Instance;
 import com.mawen.learn.nacos.client.naming.core.Domain;
 import com.mawen.learn.nacos.client.naming.utils.CollectionUtils;
+import com.mawen.learn.nacos.client.utils.ConcurrentDiskUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,14 +111,12 @@ public class DiskCache {
 					}
 					finally {
 						try {
-							try {
-								if (reader != null) {
-									reader.close();
-								}
+							if (reader != null) {
+								reader.close();
 							}
-							catch (IOException e) {
-								// ignored
-							}
+						}
+						catch (IOException e) {
+							// ignored
 						}
 					}
 

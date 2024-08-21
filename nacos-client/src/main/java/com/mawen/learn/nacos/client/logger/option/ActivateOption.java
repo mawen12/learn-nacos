@@ -3,7 +3,6 @@ package com.mawen.learn.nacos.client.logger.option;
 import java.util.List;
 
 import com.mawen.learn.nacos.client.logger.Level;
-import com.mawen.learn.nacos.client.logger.Logger;
 
 /**
  * 激活Logger的选项，请参考具体的实现逻辑：
@@ -132,7 +131,7 @@ public interface ActivateOption {
 	/**
 	 * 使用 logger 对应的 appender 来初始化当前 logger
 	 */
-	void activateAppender(Logger logger);
+//	void activateAppender(Logger logger);
 
 	/**
 	 * 设置日志级别

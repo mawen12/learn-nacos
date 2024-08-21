@@ -1,4 +1,4 @@
-package com.mawen.learn.nacos.client.naming.cache;
+package com.mawen.learn.nacos.client.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;

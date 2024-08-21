@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.alibaba.fastjson.JSON;
-import com.mawen.learn.nacos.client.naming.cache.ConcurrentDiskUtil;
+import com.mawen.learn.nacos.client.utils.ConcurrentDiskUtil;
 import com.mawen.learn.nacos.client.naming.cache.DiskCache;
 import com.mawen.learn.nacos.client.naming.core.Domain;
 import com.mawen.learn.nacos.client.naming.core.HostReactor;

@@ -70,10 +70,10 @@ public class Log4jActivateOption extends AbstractActiveOption {
 
 	}
 
-	@Override
-	public void activateAppender(com.mawen.learn.nacos.client.logger.Logger logger) {
-
-	}
+//	@Override
+//	public void activateAppender(com.mawen.learn.nacos.client.logger.Logger logger) {
+//
+//	}
 
 	@Override
 	public void setLevel(Level level) {
