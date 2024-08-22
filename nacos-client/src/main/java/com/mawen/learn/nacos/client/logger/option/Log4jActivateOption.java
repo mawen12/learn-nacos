@@ -5,7 +5,6 @@ import java.util.List;
 import com.mawen.learn.nacos.client.logger.Level;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>

@@ -27,7 +27,7 @@ public class JSONUtils {
 		return mapper.readValue(json, clazz);
 	}
 
-	public static Object deserialize(String json, TypeReference<?> typeReference) throws IOException {
+	public static Object deserializeObject(String json, TypeReference<?> typeReference) throws IOException {
 		return mapper.readValue(json, typeReference);
 	}
 

@@ -1,6 +1,5 @@
 package com.mawen.learn.nacos.client.config.utils;
 
-import jdk.jfr.internal.JVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

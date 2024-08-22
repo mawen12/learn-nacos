@@ -10,7 +10,6 @@ import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.mawen.learn.nacos.api.config.ConfigService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

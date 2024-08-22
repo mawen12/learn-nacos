@@ -24,7 +24,6 @@ public class NacosNamingService implements NamingService {
 
 	private String logName;
 
-	private
 
 	@Override
 	public void registerInstance(String serviceName, String ip, String port) throws NacosException {

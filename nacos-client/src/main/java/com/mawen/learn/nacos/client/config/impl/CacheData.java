@@ -5,13 +5,13 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import com.mawen.learn.nacos.api.config.listener.AbstractListener;
 import com.mawen.learn.nacos.api.config.listener.AbstractSharedListener;
 import com.mawen.learn.nacos.api.config.listener.Listener;
 import com.mawen.learn.nacos.api.exception.NacosException;
 import com.mawen.learn.nacos.client.config.filter.impl.ConfigFilterChainManager;
 import com.mawen.learn.nacos.client.config.filter.impl.ConfigResponse;
 import com.mawen.learn.nacos.client.config.utils.MD5;
+import com.mawen.learn.nacos.client.config.utils.TenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +42,44 @@ public class CacheData {
 
 	private volatile boolean isInitializing = false;
 
+	public CacheData(ConfigFilterChainManager configFilterChainManager, String name, String dataId, String group) {
+		if (null == dataId || null == group) {
+			throw new IllegalArgumentException("dataId = " + dataId + ", group = " + group);
+		}
+
+		this.name = name;
+		this.dataId = dataId;
+		this.group = group;
+		this.configFilterChainManager = configFilterChainManager;
+		this.tenant = TenantUtil.getUserTenant();
+		this.listeners = new CopyOnWriteArrayList<>();
+		this.isInitializing = true;
+		this.content = loadCacheContentFromDiskLocal(name, dataId, group, tenant);
+		this.md5 = getMd5String(content);
+	}
+
+	public CacheData(ConfigFilterChainManager configFilterChainManager, String name, String dataId, String group, String tenant) {
+		if (null == dataId || null == group) {
+			throw new IllegalArgumentException("dataId = " + dataId + ", group = " + group);
+		}
+
+		this.name = name;
+		this.dataId = dataId;
+		this.group = group;
+		this.configFilterChainManager = configFilterChainManager;
+		this.tenant = tenant;
+		this.listeners = new CopyOnWriteArrayList<>();
+		this.isInitializing = true;
+		this.content = loadCacheContentFromDiskLocal(name, dataId, group, tenant);
+		this.md5 = getMd5String(content);
+	}
+
 	public boolean isInitializing() {
 		return isInitializing;
+	}
+
+	public void setInitializing(boolean initializing) {
+		isInitializing = initializing;
 	}
 
 	public String getMd5() {
@@ -117,6 +153,14 @@ public class CacheData {
 		return listeners.stream().map(wrap -> wrap.listener).collect(Collectors.toList());
 	}
 
+	public String getDataId() {
+		return dataId;
+	}
+
+	public String getGroup() {
+		return group;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(dataId, group);
@@ -155,7 +199,7 @@ public class CacheData {
 
 			try {
 				if (listener instanceof AbstractSharedListener) {
-					AbstractListener adapter = (AbstractListener) listener;
+					AbstractSharedListener adapter = (AbstractSharedListener) listener;
 					adapter.fillContext(dataId, group);
 					log.info("[notify-context] dataId = {}, group = {}, md5 = {}", dataId, group, md5);
 				}
@@ -175,8 +219,34 @@ public class CacheData {
 			}
 			catch (NacosException e) {
 				// TODO start here
+				log.error("[notify-error] dataId = {}, group = {}, md5 = {}, listener = {}, errCode = {}, errMsg = {}",
+						dataId, group, md5, listener, e.getErrCode(), e.getErrMsg());
+			}
+			catch (Throwable t) {
+				log.error("[notify-error] dataId = {}, group = {}, md5 = {}, listener = {}, tx = {}",
+						dataId, group, md5, listener, t.getCause());
+			}
+			finally {
+				Thread.currentThread().setContextClassLoader(myClassLoader);
 			}
 		};
+
+		final long startNotify = System.currentTimeMillis();
+		try {
+			if (null != listener.getExecutor()) {
+				listener.getExecutor().execute(job);
+			}
+			else {
+				job.run();
+			}
+		}
+		catch (Throwable t) {
+			log.error("[notify-error] dataId = {}, group = {}, md5 = {}, listener = {}, throwable = {}",
+					dataId, group, md5, listener, t.getCause());
+		}
+		final long finishNotify = System.currentTimeMillis();
+		log.info("[notify-listener] time cost = {}ms in ClientWorker, dataId = {}, group = {}, md5 = {}, listener = {}",
+				finishNotify - startNotify, dataId, group, md5, listener);
 	}
 
 	private static String getMd5String(String config) {

@@ -3,6 +3,7 @@ package com.mawen.learn.nacos.api.config;
 import java.util.Properties;
 
 import com.mawen.learn.nacos.api.PropertyKeyConst;
+import com.mawen.learn.nacos.client.config.NacosConfigService;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>

@@ -2,7 +2,6 @@ package com.mawen.learn.nacos.client.logger.support;
 
 import java.io.PrintStream;
 import java.util.Calendar;
-import java.util.StringTokenizer;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
