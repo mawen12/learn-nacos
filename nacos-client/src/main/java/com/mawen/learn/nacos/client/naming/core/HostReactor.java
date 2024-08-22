@@ -178,11 +178,16 @@ public class HostReactor {
 		return domMap.get(key);
 	}
 
-	private Domain getDom(String dom, String clusters, String env) {
+	public Domain getDom(String dom, String clusters) {
+		String env = StringUtils.EMPTY;
 		return getDom(dom, clusters, env, false);
 	}
 
-	private Domain getDom(final String dom, final String clusters, final String env, final boolean allIPs) {
+	public Domain getDom(String dom, String clusters, String env) {
+		return getDom(dom, clusters, env, false);
+	}
+
+	public Domain getDom(final String dom, final String clusters, final String env, final boolean allIPs) {
 		log.debug("failover-mode: {}", failoverReactor.isFailoverSwitch());
 
 		String key = Domain.getKey(dom, clusters, env, allIPs);

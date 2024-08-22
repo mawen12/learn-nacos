@@ -12,15 +12,15 @@ import com.mawen.learn.nacos.api.naming.pojo.Instance;
  */
 public interface NamingService {
 
-	void registerInstance(String serviceName, String ip, String port) throws NacosException;
+	void registerInstance(String serviceName, String ip, int port) throws NacosException;
 
-	void registerInstance(String serviceName, String ip, String port, String clusterName) throws NacosException;
+	void registerInstance(String serviceName, String ip, int port, String clusterName) throws NacosException;
 
 	void registerInstance(String serviceName, Instance instance) throws NacosException;
 
-	void deregisterInstance(String serviceName, String ip, String port) throws NacosException;
+	void deregisterInstance(String serviceName, String ip, int port) throws NacosException;
 
-	void deregisterInstance(String serviceName, String ip, String port, String clusterName) throws NacosException;
+	void deregisterInstance(String serviceName, String ip, int port, String clusterName) throws NacosException;
 
 	List<Instance> getAllInstances(String serviceName) throws NacosException;
 

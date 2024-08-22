@@ -3,6 +3,7 @@ package com.mawen.learn.nacos.client.config.utils;
 import java.util.List;
 
 import com.mawen.learn.nacos.api.exception.NacosException;
+import com.mawen.learn.nacos.client.utils.IPUtil;
 import org.apache.commons.lang3.StringUtils;
 
 /**

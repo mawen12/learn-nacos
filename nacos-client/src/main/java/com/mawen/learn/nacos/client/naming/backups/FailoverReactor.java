@@ -61,7 +61,7 @@ public class FailoverReactor {
 	}
 
 	public void init() {
-		this.executorService.scheduleWithFixedDelay(new SwtichRefresher(), 0L, 5000L, TimeUnit.MILLISECONDS);
+		this.executorService.scheduleWithFixedDelay(new SwitchRefresher(), 0L, 5000L, TimeUnit.MILLISECONDS);
 
 		this.executorService.scheduleWithFixedDelay(new DiskFileWriter(), 30, DAY_PERIOD_MINUTES, TimeUnit.MINUTES);
 

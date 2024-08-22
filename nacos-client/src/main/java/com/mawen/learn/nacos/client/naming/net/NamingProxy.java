@@ -20,6 +20,7 @@ import com.mawen.learn.nacos.client.naming.utils.CollectionUtils;
 import com.mawen.learn.nacos.client.naming.utils.UtilAndComs;
 import com.mawen.learn.nacos.common.util.IoUtils;
 import com.mawen.learn.nacos.common.util.UuidUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +29,8 @@ import org.slf4j.LoggerFactory;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/8/19
  */
+@Slf4j
 public class NamingProxy {
-
-	private static final Logger log = LoggerFactory.getLogger(NamingProxy.class);
 
 	private String namespace;
 
@@ -130,6 +130,28 @@ public class NamingProxy {
 		params.put("cluster", cluster);
 
 		reqAPI(UtilAndComs.NACOS_URL_INSTANCE, params, "DELETE");
+	}
+
+	public String callAllServers(String api, Map<String, String> params) {
+		String result = "";
+
+		List<String> snapshot = serversFromEndpoint;
+		if (!CollectionUtils.isEmpty(serverList)) {
+			snapshot = serverList;
+		}
+
+		try {
+			result = reqAPI(api, params, snapshot);
+		}
+		catch (Exception e) {
+			log.error("req api: {} failed, server: {}", api, snapshot, e);
+		}
+
+		if (StringUtils.isNotEmpty(result)) {
+			return result;
+		}
+
+		throw new IllegalStateException("failed to req API:/api/" + api + " after all sites(" + snapshot + ")");
 	}
 
 	public String reqAPI(String api, Map<String, String> params) {
