@@ -250,7 +250,7 @@ public class VirtualClusterDomain implements Domain, RaftListener {
 			clusters.put("healthChecker", cluster.getHealthChecker());
 			clusters.put("defCkport", cluster.getDefCkPort());
 			clusters.put("defIPPort", cluster.getDefIPPort());
-			clusters.put("")
+			clusters.put("useIPPort4Check", cluster.);
 		}
 
 	}

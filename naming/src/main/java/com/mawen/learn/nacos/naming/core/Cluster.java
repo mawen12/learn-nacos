@@ -1,6 +1,16 @@
 package com.mawen.learn.nacos.naming.core;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 import com.alibaba.fastjson.annotation.JSONField;
+import com.mawen.learn.nacos.naming.healthcheck.AbstractHealthCheckConfig;
+import com.mawen.learn.nacos.naming.healthcheck.HealthCheckTask;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -23,9 +33,59 @@ public class Cluster implements Cloneable {
 
 	private boolean useIPPort4Check = true;
 
-	@JSONField(name = 'nodegroup')
+	@JSONField(name = "nodegroup")
 	private String legacySyncConfig;
 
 	@JSONField(name = "healthChecker")
-	private AbstractHealthCheckConfig healthChecker = new AbstractCheckConfig.Tcp();
+	private AbstractHealthCheckConfig healthChecker = new AbstractHealthCheckConfig.Tcp();
+
+	@JSONField(serialize = false)
+	private HealthCheckTask checkTask;
+
+	@JSONField(serialize = false)
+	private Set<IpAddress> ips = new HashSet<>();
+
+	@JSONField(serialize = false)
+	private Set<IpAddress> raftIPs = new HashSet<>();
+
+	@JSONField(serialize = false)
+	private Domain dom;
+
+	private Map<String, Boolean> ipContains = new ConcurrentHashMap<>();
+
+	private Map<String, String> metadata = new ConcurrentHashMap<>();
+
+	public Cluster() {}
+
+	public int getDefIpPort() {
+		return defIpPort == -1 ? defCkport : defIpPort;
+	}
+
+	public void setDefIpPort(int defIpPort) {
+		if (defIpPort == 0) {
+			throw new IllegalArgumentException("defIPPort can not be 0");
+		}
+		this.defIpPort = defIpPort;
+	}
+
+	public List<IpAddress> allIPs() {
+		return new ArrayList<>(chooseIPs());
+	}
+
+	public List<IpAddress> allIPs(String tenant) {
+		return chooseIPs().stream().filter(ip -> ip.getTenant().equals(tenant)).collect(Collectors.toList());
+	}
+
+	public List<IpAddress> allIPs(String tenant, String app) {
+		return chooseIPs().stream().filter(ip -> ip.getTenant().equals(tenant) && ip.getApp().equals(app)).collect(Collectors.toList());
+	}
+
+	public void init() {
+		checkTask = new HealthCheckTask(this);
+		HealthCheckReactor.scheduleCheck(checkTask);
+	}
+
+	public Set<IpAddress> chooseIPs() {
+		return raftIPs;
+	}
 }
